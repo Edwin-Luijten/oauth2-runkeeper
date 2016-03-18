@@ -99,8 +99,13 @@ class RunkeeperTest extends \PHPUnit_Framework_TestCase
             $this->provider->getBaseAccessTokenUrl([])
         );
         $this->assertEquals(
-            $this->provider->apiDomain . '/profile?access_token=' . $token,
+            $this->provider->apiDomain . '/user?access_token=' . $token,
             $this->provider->getResourceOwnerDetailsUrl($token)
+        );
+
+        $this->assertEquals(
+            $this->provider->apiDomain . '/profile?access_token=' . $token,
+            $this->provider->getResourceOwnerProfileUrl($token)
         );
 
     }
@@ -125,19 +130,19 @@ class RunkeeperTest extends \PHPUnit_Framework_TestCase
         $postResponse->shouldReceive('getStatusCode')->andReturn(200);
         $userResponse = m::mock('Psr\Http\Message\ResponseInterface');
         $userResponse->shouldReceive('getBody')->andReturn(
-            '{"id": "' . $id . '", "name": "' . $name . '", "email": "' . $email . '", "elite": "' . $elite . '", "location": "' . $location . '", "athlete_type": "' . $athleteType . '", "gender": "' . $gender . '", "birthday": "' . $birthday . '", "profile": "' . $profile . '"}'
+            '{"userID": "' . $id . '", "name": "' . $name . '", "email": "' . $email . '", "elite": "' . $elite . '", "location": "' . $location . '", "athlete_type": "' . $athleteType . '", "gender": "' . $gender . '", "birthday": "' . $birthday . '", "profile": "' . $profile . '"}'
         );
         $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
         $userResponse->shouldReceive('getStatusCode')->andReturn(200);
         $client = m::mock('GuzzleHttp\ClientInterface');
         $client->shouldReceive('send')
-            ->times(2)
+            ->times(3)
             ->andReturn($postResponse, $userResponse);
         $this->provider->setHttpClient($client);
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $user  = $this->provider->getResourceOwner($token);
         $this->assertEquals($id, $user->getId());
-        $this->assertEquals($id, $user->toArray()['id']);
+        $this->assertEquals($id, $user->toArray()['userID']);
         $this->assertEquals($name, $user->getName());
         $this->assertEquals($name, $user->toArray()['name']);
         $this->assertEquals($email, $user->getEmail());

@@ -46,6 +46,18 @@ class Runkeeper extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
+        return $this->apiDomain . '/user?access_token=' . $token;
+    }
+
+    /**
+     * Get provider url to fetch user profile details
+     *
+     * @param  AccessToken $token
+     *
+     * @return string
+     */
+    public function getResourceOwnerProfileUrl(AccessToken $token)
+    {
         return $this->apiDomain . '/profile?access_token=' . $token;
     }
 
@@ -80,6 +92,40 @@ class Runkeeper extends AbstractProvider
                 $response
             );
         }
+    }
+
+    /**
+     * Requests and returns the resource owner of given access token.
+     *
+     * @param  AccessToken $token
+     * @return ResourceOwnerInterface
+     */
+    public function getResourceOwner(AccessToken $token)
+    {
+        $response = $this->fetchResourceOwnerDetails($token);
+
+        return $this->createResourceOwner($response, $token);
+    }
+
+    /**
+     * Requests resource owner details.
+     *
+     * @param  AccessToken $token
+     * @return mixed
+     */
+    protected function fetchResourceOwnerDetails(AccessToken $token)
+    {
+        $url = $this->getResourceOwnerDetailsUrl($token);
+        $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
+
+        $userDetails = $this->getResponse($request);
+
+        $url = $this->getResourceOwnerProfileUrl($token);
+        $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
+
+        $userProfile = $this->getResponse($request);
+
+        return array_merge($userDetails, $userProfile);
     }
 
     /**

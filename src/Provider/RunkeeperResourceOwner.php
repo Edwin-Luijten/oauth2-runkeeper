@@ -36,7 +36,7 @@ class RunkeeperResourceOwner implements ResourceOwnerInterface
      */
     public function getId()
     {
-        return null;
+        return $this->response['userID'] ?: null;
     }
 
     /**
