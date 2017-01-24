@@ -118,12 +118,12 @@ class Runkeeper extends AbstractProvider
         $url = $this->getResourceOwnerDetailsUrl($token);
         $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
 
-        $userDetails = $this->getResponse($request);
+        $userDetails = $this->getParsedResponse($request);
 
         $url = $this->getResourceOwnerProfileUrl($token);
         $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
 
-        $userProfile = $this->getResponse($request);
+        $userProfile = $this->getParsedResponse($request);
 
         return array_merge($userDetails, $userProfile);
     }
